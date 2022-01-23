@@ -1,7 +1,6 @@
 requests
 #urllib
 #urllib.request
-sqlite3
 pandas==1.2.2
 numpy==1.19.5
 autobahn==21.2.1
