@@ -148,6 +148,27 @@ def calc_fun(df):
     return indicator, indicator_sma
 
 
+stock_list = create_Stocks()
+stock_1 = stock_list[0]
+
+START_TIME = 1637355600000
+END_TIME = 1642712400000
+RESOLUTION = '15'
+stock_1.initialize_dfs(START_TIME, END_TIME, RESOLUTION)
+print(stock_1.df.tail())
+
+
+# msg = 'BIST tracker baslatildi.'
+# try:
+#     MyBot.send_message(chat_id=ChatID, text=msg)
+# except Exception as e:
+#     print(str(e))
+#     try:
+#         time.sleep(20)
+#         MyBot.send_message(chat_id=ChatID, text=msg)
+#     except:
+#         print("Telegram send error...")
+
 def plot():
     df = stock_1.df
     for i in range(1, len(df['FUN(8)'])):
@@ -205,26 +226,3 @@ def plot():
     fig.text(0.1, 0.9, stock_1.name, size=10, fontweight='bold', color='w')
     fig.subplots_adjust(bottom=0.1, right=0.5, top=3.9, hspace=3)
     plt.show()
-
-
-stock_list = create_Stocks()
-stock_1 = stock_list[0]
-
-START_TIME = 1637355600000
-END_TIME = 1642712400000
-RESOLUTION = '15'
-stock_1.initialize_dfs(START_TIME, END_TIME, RESOLUTION)
-print(stock_1.df.tail())
-
-plot()
-
-# msg = 'BIST tracker baslatildi.'
-# try:
-#     MyBot.send_message(chat_id=ChatID, text=msg)
-# except Exception as e:
-#     print(str(e))
-#     try:
-#         time.sleep(20)
-#         MyBot.send_message(chat_id=ChatID, text=msg)
-#     except:
-#         print("Telegram send error...")
