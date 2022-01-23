@@ -3,7 +3,7 @@ numpy==1.19.5
 autobahn==21.2.1
 python-telegram-bot==13.4.1
 datetime
-json
+json5==0.9.6
 math
 os
 requests
