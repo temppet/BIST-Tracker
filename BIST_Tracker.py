@@ -2,13 +2,14 @@ import datetime
 import json
 import math
 import os
-import requests
 import sqlite3
 import time
 import urllib
 import urllib.request
+
 import numpy as np
 import pandas as pd
+import requests
 from telegram.ext import Updater
 
 # TELEGRAM Constants
@@ -16,7 +17,7 @@ TG_TOKEN = '1079945138:AAFpAWUd8AYgTsq8dkjJKg_HOEWAIXHItTA'
 TG_URL = "https://api.telegram.org/bot{}/".format(TG_TOKEN)
 ChatID = '-434324601'  # '990652176': me, #'-553704593': group
 # Telegram BOT starter functions
-updater = Updater(TG_TOKEN)
+updater = Updater(TG_TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 MyBot = updater.bot  # Bot instance to use that is bound to the token.
 
