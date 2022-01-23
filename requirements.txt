@@ -1,6 +1,6 @@
 requests
-urllib
-urllib.request
+#urllib
+#urllib.request
 sqlite3
 pandas==1.2.2
 numpy==1.19.5
