@@ -7,11 +7,8 @@ import sqlite3
 import time
 import urllib
 import urllib.request
-
-import mplfinance as mpf
 import numpy as np
 import pandas as pd
-from tabulate import tabulate
 from telegram.ext import Updater
 
 # TELEGRAM Constants
@@ -159,7 +156,7 @@ START_TIME = 1637355600000
 END_TIME = 1642712400000
 RESOLUTION = '15'
 stock_1.initialize_dfs(START_TIME, END_TIME, RESOLUTION)
-print(tabulate(stock_1.df.tail(), headers=stock_1.df.columns))
+print(stock_1.df.tail())
 
 msg = 'BIST tracker baslatildi.'
 try:
