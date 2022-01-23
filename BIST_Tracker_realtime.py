@@ -4,8 +4,6 @@ import time
 import urllib
 import urllib.request
 
-import matplotlib.pyplot as plt
-import mplfinance as mpf
 import numpy as np
 import pandas as pd
 from telegram.ext import Updater
@@ -72,7 +70,16 @@ class stock:
 
 
 def create_Stocks():
-    StockList = ['GUBRF', ]
+    StockList = ['MAVI', 'ASELS', 'THYAO', 'ERBOS', 'MGROS', 'KRDMD', 'TTKOM', 'ISCTR',
+                 'KARSN', 'ARCLK', 'ALARK', 'KLGYO', 'VAKKO', 'PETKM', 'TCELL', 'BERA',
+                 'GLYHO', 'CCOLA', 'KCHOL', 'GARAN', 'ENKAI', 'AKGRT', 'TAVHL',
+                 'KOZAL', 'BRSAN', 'ULKER', 'VESTL', 'YATAS', 'SASA', 'SELEC', 'SISE',
+                 'TMSN', 'TOASO', 'TTRAK', 'SOKM', 'KAREL', 'KARTN', 'KLMSN',
+                 'KORDS', 'LOGO', 'MPARK', 'NETAS', 'OTKAR', 'SARKY', 'HALKB', 'HEKTS',
+                 'IPEKE', 'ISDMR', 'ISMEN', 'ECZYT', 'ENJSA', 'FROTO', 'CEMTS', 'CIMSA',
+                 'CLEBI', 'DOAS', 'ECILC', 'BRISA', 'AYGAZ', 'EREGL', 'ALGYO', 'AKSA',
+                 'AKCNS', 'KOZAA', 'SAHOL', 'AEFES', 'AGHOL']
+    # StockList = ['ASELS', ]
     MyList = np.array([])
     for i in range(len(StockList)):
         MyList = np.append(MyList, stock(StockList[i]))
@@ -148,81 +155,71 @@ def calc_fun(df):
     return indicator, indicator_sma
 
 
-stock_list = create_Stocks()
-stock_1 = stock_list[0]
+def init_all(stock_list):
+    global RESOLUTION
+    START_TIME = 1642409400000  # 1637355600000
+    END_TIME = time.time()  # 1642712400000
+    for stock in stock_list:
+        stock.initialize_dfs(START_TIME, END_TIME, RESOLUTION)
 
-START_TIME = 1637355600000
-END_TIME = 1642712400000
+
+def send_notification(msg):
+    try:
+        MyBot.send_message(chat_id=ChatID, text=msg)
+    except Exception as e:
+        print(str(e))
+        try:
+            time.sleep(20)
+            MyBot.send_message(chat_id=ChatID, text=msg)
+        except:
+            print("Telegram send error...")
+
+
 RESOLUTION = '15'
-stock_1.initialize_dfs(START_TIME, END_TIME, RESOLUTION)
-print(stock_1.df.tail())
+stock_list = create_Stocks()
+init_all(stock_list)
 
-
-# msg = 'BIST tracker baslatildi.'
-# try:
-#     MyBot.send_message(chat_id=ChatID, text=msg)
-# except Exception as e:
-#     print(str(e))
-#     try:
-#         time.sleep(20)
-#         MyBot.send_message(chat_id=ChatID, text=msg)
-#     except:
-#         print("Telegram send error...")
-
-def plot():
-    df = stock_1.df
-    for i in range(1, len(df['FUN(8)'])):
-        buy_cond_1 = df['FUN(8)'][i] < df['FUN(8)'][i - 1] and df['FUN(8)'][i - 2] < df['FUN(8)'][i - 1]
-        buy_cond_2 = df['FUN(8)'][i] > 70
-        buy_cond_3 = df['FUN(8)'][i] > 70 and df['FUN(8)'][i - 1] > 70 and df['FUN(8)'][i - 2] > 70
-        if buy_cond_1 and buy_cond_2 and buy_cond_3:
-            df.loc[i, 'BUY'] = 1
-        else:
-            df.loc[i, 'BUY'] = np.nan
-        sell_cond_1 = df['FUN(8)'][i] > df['FUN(8)'][i - 1] and df['FUN(8)'][i - 2] > df['FUN(8)'][i - 1]
-        sell_cond_2 = df['FUN(8)'][i] < 30
-        sell_cond_3 = df['FUN(8)'][i] < 30 and df['FUN(8)'][i - 1] < 30 and df['FUN(8)'][i - 2] < 30
-        if sell_cond_1 and sell_cond_2 and sell_cond_3:
-            df.loc[i, 'SELL'] = 1
-        else:
-            df.loc[i, 'SELL'] = np.nan
-
-    back_idx = -600
-    df = stock_1.df.copy()
-    df = df.rename(columns={'OPEN': 'Open', 'HIGH': 'High', 'LOW': 'Low', 'CLOSE': 'Close', 'VOLUME': 'Volume'})
-    df['TIME'] = pd.to_datetime(df['TIME'], unit='ms')
-    df = df.set_index('TIME')
-    marksize = 100
-    bollingers = df[['BOLL_H', 'BOLL_L', 'BOLL_M']]
-    apd = []
-    apd.append(mpf.make_addplot(bollingers[back_idx:], panel=0, y_on_right=False, secondary_y=False, type='line',
-                                color='#8f0b0b', width=1.5))
-    apd.append(mpf.make_addplot(df['FUN(8)'][back_idx:], panel=1, y_on_right=False, secondary_y=False, type='line',
-                                color='blue', width=1.2))
-    apd.append(mpf.make_addplot(70 * np.ones(len(df['FUN(8)'][back_idx:])), panel=1, color='white', secondary_y=False))
-    apd.append(mpf.make_addplot(20 * np.ones(len(df['FUN(8)'][back_idx:])), panel=1, color='white', secondary_y=False))
-
-    apd.append(mpf.make_addplot(df['BUY'][back_idx:] * df['Low'][back_idx:] * 0.995, scatter=True, secondary_y=False,
-                                y_on_right=False, markersize=marksize, marker='^', color='g'))
-    apd.append(mpf.make_addplot(df['SELL'][back_idx:] * df['High'][back_idx:] * 1.005, scatter=True, secondary_y=False,
-                                y_on_right=False, markersize=marksize, marker='^', color='r'))
-
-    mc = mpf.make_marketcolors(up='g', down='r', wick='w', edge='w')
-    s = mpf.make_mpf_style(base_mpf_style='binance', base_mpl_style='dark_background',
-                           gridcolor='#000000', facecolor='#000000', y_on_right=False, marketcolors=mc, gridstyle=':',
-                           rc={
-                               'axes.edgecolor': '#737378',
-                               'axes.linewidth': 0.4,
-                               'axes.labelsize': 'medium',
-                               'axes.labelweight': 'semibold',
-                               # 'lines.linewidth': 1.0,
-                               'font.weight': 'medium',
-                               'font.size': 8.0}, mavcolors=['#c3c90c', '#f08b11', '#11f0e1', '#117df0'])
-
-    fig, axlist = mpf.plot(df[back_idx:], volume=False, type='candle', figsize=(16, 9), style=s, ylabel=("ETH_"),
-                           addplot=apd, scale_width_adjustment=dict(candle=2), returnfig=True,
-                           mav=(10, 50, 100, 200))
-    axlist[0].legend(['MOV10', 'MOV50', 'MOV100', 'MOV200'])
-    fig.text(0.1, 0.9, stock_1.name, size=10, fontweight='bold', color='w')
-    fig.subplots_adjust(bottom=0.1, right=0.5, top=3.9, hspace=3)
-    plt.show()
+while 1:
+    last_time_in_data = stock_list[0].df['TIME'][-1]
+    now = time.time()
+    if now > last_time_in_data + 30 * 60000 + 10000:
+        for stock in stock_list:
+            url = 'https://web-cloud-new.foreks.com/tradingview-services/trading-view/history?symbol=' + stock.name + \
+                  '.E.BIST&resolution=' + RESOLUTION + '&from=' + str(int(last_time_in_data + 10000)) + '&to=' + \
+                  str(int(now)) + '&currency=TRL'
+            data = urllib.request.urlopen(url).read()
+            data = json.loads(data.decode('utf-8'))
+            if int(stock.df['TIME'][-1]) < int(data['t'][-1]):
+                stock.df = stock.df.append({
+                    'TIME': data['t'][-1],
+                    'DATE': str(datetime.datetime.fromtimestamp(data['t'][-1] / 1000.0)),
+                    'OPEN': data['o'][-1],
+                    'HIGH': data['h'][-1],
+                    'LOW': data['l'][-1],
+                    'CLOSE': data['c'][-1],
+                    'VOLUME': data['v'][-1],
+                    'RSI': 0, 'IFTRSI': 0, 'BOLL_H': 0, 'BOLL_M': 0, 'BOLL_L': 0, 'STD': 0, 'MACD': 0, 'MACD_S': 0,
+                    'MA_200': 0, 'MA_50': 0, 'MA_10': 0, 'VOLUME(10)': 0, 'BUY': np.nan, 'FUN': 0, 'FUN(8)': 0
+                }, ignore_index=True)
+                stock.update_indicators(stock.df)
+                buy_cond_1 = stock.df['FUN(8)'][-1] < stock.df['FUN(8)'][-2] and stock.df['FUN(8)'][-3] < \
+                             stock.df['FUN(8)'][-2]
+                buy_cond_2 = stock.df['FUN(8)'][-1] > 70
+                buy_cond_3 = stock.df['FUN(8)'][-1] > 70 and stock.df['FUN(8)'][-2] > 70 and stock.df['FUN(8)'][-3] > 70
+                if buy_cond_1 and buy_cond_2 and buy_cond_3 and int(stock.df['TIME'][-1]) > stock.C1 + 60000 * 15 * 8:
+                    stock.C1 = int(stock.df['TIME'][-1])
+                    msg = f"{CHART_EMOJI}  {stock.name} icin alim zamani. {GREEN_CIRCLE_EMOJI}"
+                    send_notification(msg)
+                sell_cond_1 = stock.df['FUN(8)'][-1] > stock.df['FUN(8)'][-2] and stock.df['FUN(8)'][-3] > \
+                              stock.df['FUN(8)'][-2]
+                sell_cond_2 = stock.df['FUN(8)'][-1] < 30
+                sell_cond_3 = stock.df['FUN(8)'][-1] < 30 and stock.df['FUN(8)'][-2] < 30 and stock.df['FUN(8)'][
+                    -3] < 30
+                if sell_cond_1 and sell_cond_2 and sell_cond_3 and int(
+                        stock.df['TIME'][-1]) > stock.C2 + 60000 * 15 * 8:
+                    stock.C2 = int(stock.df['TIME'][-1])
+                    msg = f"{CHART_EMOJI}  {stock.name} icin satis zamani. {RED_CIRCLE_EMOJI}"
+                    send_notification(msg)
+        last_time_in_data = stock.df['TIME'][-1]
+    else:
+        time.sleep(60)
