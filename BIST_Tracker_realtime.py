@@ -234,5 +234,14 @@ while 1:
         print(f"Stock name: {sto.name}")
         print(sto.df['DATE'].iloc[-5:], sto.df['FUN(8)'].iloc[-5:])
     else:
-        print('Waiting 1 minute for new data...')
-        time.sleep(60)
+        [days, times] = stock_list[0].df['DATE'].iloc[-1].split(' ')
+        hour_last = times.split(':')[0]
+        now_date = str(datetime.datetime.fromtimestamp(time.time()))
+        [days, times] = now_date.split(' ')
+        hour_now = times.split(':')[0]
+        if int(hour_last) == 15 and (hour_now >= 15 or hour_now < 6):
+            print(f"Its night time, it is: {now_date} waiting for 1 hour...")
+            time.sleep(3600)
+        else:
+            print('Waiting 1 minute for new data...')
+            time.sleep(60)
