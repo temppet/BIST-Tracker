@@ -236,10 +236,11 @@ while 1:
     else:
         [days, times] = stock_list[0].df['DATE'].iloc[-1].split(' ')
         hour_last = times.split(':')[0]
+        min_last = times.split(':')[1]
         now_date = str(datetime.datetime.fromtimestamp(time.time()))
         [days, times] = now_date.split(' ')
         hour_now = times.split(':')[0]
-        if int(hour_last) == 15 and (hour_now >= 15 or hour_now < 6):
+        if int(hour_last) == 14 and int(min_last) == 45 and (hour_now >= 15 or hour_now < 6):
             print(f"Its night time, it is: {now_date} waiting for 1 hour...")
             time.sleep(3600)
         else:
