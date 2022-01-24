@@ -1,5 +1,6 @@
 import datetime
 import json
+import random
 import time
 import urllib
 import urllib.request
@@ -158,7 +159,7 @@ def calc_fun(df):
 def init_all(stock_list):
     global RESOLUTION
     START_TIME = 1642409400000  # 1637355600000
-    END_TIME = time.time()  # 1642712400000
+    END_TIME = int(time.time() * 1000)  # 1642712400000
     for stock in stock_list:
         stock.initialize_dfs(START_TIME, END_TIME, RESOLUTION)
 
@@ -178,48 +179,60 @@ def send_notification(msg):
 RESOLUTION = '15'
 stock_list = create_Stocks()
 init_all(stock_list)
+print(stock_list[0].df.tail())
+send_notification('BIST Track baslatildi.')
 
 while 1:
-    last_time_in_data = stock_list[0].df['TIME'][-1]
-    now = time.time()
+    last_time_in_data = stock_list[0].df['TIME'].iloc[-1]
+    now = int(time.time() * 1000)
     if now > last_time_in_data + 30 * 60000 + 10000:
         for stock in stock_list:
             url = 'https://web-cloud-new.foreks.com/tradingview-services/trading-view/history?symbol=' + stock.name + \
                   '.E.BIST&resolution=' + RESOLUTION + '&from=' + str(int(last_time_in_data + 10000)) + '&to=' + \
-                  str(int(now)) + '&currency=TRL'
+                  str(now) + '&currency=TRL'
             data = urllib.request.urlopen(url).read()
             data = json.loads(data.decode('utf-8'))
-            if int(stock.df['TIME'][-1]) < int(data['t'][-1]):
-                stock.df = stock.df.append({
-                    'TIME': data['t'][-1],
-                    'DATE': str(datetime.datetime.fromtimestamp(data['t'][-1] / 1000.0)),
-                    'OPEN': data['o'][-1],
-                    'HIGH': data['h'][-1],
-                    'LOW': data['l'][-1],
-                    'CLOSE': data['c'][-1],
-                    'VOLUME': data['v'][-1],
-                    'RSI': 0, 'IFTRSI': 0, 'BOLL_H': 0, 'BOLL_M': 0, 'BOLL_L': 0, 'STD': 0, 'MACD': 0, 'MACD_S': 0,
-                    'MA_200': 0, 'MA_50': 0, 'MA_10': 0, 'VOLUME(10)': 0, 'BUY': np.nan, 'FUN': 0, 'FUN(8)': 0
-                }, ignore_index=True)
-                stock.update_indicators(stock.df)
-                buy_cond_1 = stock.df['FUN(8)'][-1] < stock.df['FUN(8)'][-2] and stock.df['FUN(8)'][-3] < \
-                             stock.df['FUN(8)'][-2]
-                buy_cond_2 = stock.df['FUN(8)'][-1] > 70
-                buy_cond_3 = stock.df['FUN(8)'][-1] > 70 and stock.df['FUN(8)'][-2] > 70 and stock.df['FUN(8)'][-3] > 70
-                if buy_cond_1 and buy_cond_2 and buy_cond_3 and int(stock.df['TIME'][-1]) > stock.C1 + 60000 * 15 * 8:
-                    stock.C1 = int(stock.df['TIME'][-1])
-                    msg = f"{CHART_EMOJI}  {stock.name} icin alim zamani. {GREEN_CIRCLE_EMOJI}"
-                    send_notification(msg)
-                sell_cond_1 = stock.df['FUN(8)'][-1] > stock.df['FUN(8)'][-2] and stock.df['FUN(8)'][-3] > \
-                              stock.df['FUN(8)'][-2]
-                sell_cond_2 = stock.df['FUN(8)'][-1] < 30
-                sell_cond_3 = stock.df['FUN(8)'][-1] < 30 and stock.df['FUN(8)'][-2] < 30 and stock.df['FUN(8)'][
-                    -3] < 30
-                if sell_cond_1 and sell_cond_2 and sell_cond_3 and int(
-                        stock.df['TIME'][-1]) > stock.C2 + 60000 * 15 * 8:
-                    stock.C2 = int(stock.df['TIME'][-1])
-                    msg = f"{CHART_EMOJI}  {stock.name} icin satis zamani. {RED_CIRCLE_EMOJI}"
-                    send_notification(msg)
-        last_time_in_data = stock.df['TIME'][-1]
+            if len(data['t']) > 0:
+                if int(stock.df['TIME'].iloc[-1]) < int(data['t'][-1]):
+                    stock.df = stock.df.append({
+                        'TIME': data['t'][-1],
+                        'DATE': str(datetime.datetime.fromtimestamp(data['t'][-1] / 1000.0)),
+                        'OPEN': data['o'][-1],
+                        'HIGH': data['h'][-1],
+                        'LOW': data['l'][-1],
+                        'CLOSE': data['c'][-1],
+                        'VOLUME': data['v'][-1],
+                        'RSI': 0, 'IFTRSI': 0, 'BOLL_H': 0, 'BOLL_M': 0, 'BOLL_L': 0, 'STD': 0, 'MACD': 0, 'MACD_S': 0,
+                        'MA_200': 0, 'MA_50': 0, 'MA_10': 0, 'VOLUME(10)': 0, 'BUY': np.nan, 'FUN': 0, 'FUN(8)': 0
+                    }, ignore_index=True)
+                    stock.update_indicators(stock.df)
+                    buy_cond_1 = stock.df['FUN(8)'].iloc[-1] < stock.df['FUN(8)'].iloc[-2] and stock.df['FUN(8)'].iloc[
+                        -3] < \
+                                 stock.df['FUN(8)'].iloc[-2]
+                    buy_cond_2 = stock.df['FUN(8)'].iloc[-1] > 70
+                    buy_cond_3 = stock.df['FUN(8)'].iloc[-1] > 70 and stock.df['FUN(8)'].iloc[-2] > 70 and \
+                                 stock.df['FUN(8)'].iloc[-3] > 70
+                    if buy_cond_1 and buy_cond_2 and buy_cond_3 and int(
+                            stock.df['TIME'].iloc[-1]) > stock.C1 + 60000 * 15 * 8:
+                        stock.C1 = int(stock.df['TIME'].iloc[-1])
+                        msg = f"{CHART_EMOJI}  {stock.name} icin alim zamani. {GREEN_CIRCLE_EMOJI}"
+                        send_notification(msg)
+                    sell_cond_1 = stock.df['FUN(8)'].iloc[-1] > stock.df['FUN(8)'].iloc[-2] and stock.df['FUN(8)'].iloc[
+                        -3] > \
+                                  stock.df['FUN(8)'].iloc[-2]
+                    sell_cond_2 = stock.df['FUN(8)'].iloc[-1] < 30
+                    sell_cond_3 = stock.df['FUN(8)'].iloc[-1] < 30 and stock.df['FUN(8)'].iloc[-2] < 30 and \
+                                  stock.df['FUN(8)'].iloc[
+                                      -3] < 30
+                    if sell_cond_1 and sell_cond_2 and sell_cond_3 and int(
+                            stock.df['TIME'].iloc[-1]) > stock.C2 + 60000 * 15 * 8:
+                        stock.C2 = int(stock.df['TIME'].iloc[-1])
+                        msg = f"{CHART_EMOJI}  {stock.name} icin satis zamani. {RED_CIRCLE_EMOJI}"
+                        send_notification(msg)
+        last_time_in_data = stock.df['TIME'].iloc[-1]
+        sto = stock_list[random.randint(0, len(stock_list) - 1)]
+        print(f"Stock name: {sto.name}")
+        print(sto.df['DATE'].iloc[-5:], sto.df['FUN(8)'].iloc[-5:])
     else:
+        print('Waiting 1 minute for new data...')
         time.sleep(60)
