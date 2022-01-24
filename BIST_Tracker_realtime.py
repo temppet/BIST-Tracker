@@ -188,7 +188,7 @@ while 1:
     now_date = str(datetime.datetime.fromtimestamp(time.time()))
     [days, times] = now_date.split(' ')
     hour_now = times.split(':')[0]
-    if now > last_time_in_data + 30 * 60000 + 10000 and (hour_now < 15 and hour_now >= 6):
+    if now > last_time_in_data + 30 * 60000 + 10000 and (int(hour_now) < 15 and int(hour_now) >= 6):
         for stock in stock_list:
             url = 'https://web-cloud-new.foreks.com/tradingview-services/trading-view/history?symbol=' + stock.name + \
                   '.E.BIST&resolution=' + RESOLUTION + '&from=' + str(int(last_time_in_data + 10000)) + '&to=' + \
@@ -243,7 +243,7 @@ while 1:
         now_date = str(datetime.datetime.fromtimestamp(time.time()))
         [days, times] = now_date.split(' ')
         hour_now = times.split(':')[0]
-        if int(hour_last) == 14 and int(min_last) == 45 and (hour_now >= 15 or hour_now < 6):
+        if int(hour_last) == 14 and int(min_last) == 45 and (int(hour_now) >= 15 or int(hour_now) < 6):
             print(f"Its night time, it is: {now_date} waiting for 1 hour...")
             time.sleep(3600)
         else:
