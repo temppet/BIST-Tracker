@@ -185,7 +185,10 @@ send_notification('BIST Track baslatildi.')
 while 1:
     last_time_in_data = stock_list[0].df['TIME'].iloc[-1]
     now = int(time.time() * 1000)
-    if now > last_time_in_data + 30 * 60000 + 10000:
+    now_date = str(datetime.datetime.fromtimestamp(time.time()))
+    [days, times] = now_date.split(' ')
+    hour_now = times.split(':')[0]
+    if now > last_time_in_data + 30 * 60000 + 10000 and (hour_now < 15 and hour_now >= 6):
         for stock in stock_list:
             url = 'https://web-cloud-new.foreks.com/tradingview-services/trading-view/history?symbol=' + stock.name + \
                   '.E.BIST&resolution=' + RESOLUTION + '&from=' + str(int(last_time_in_data + 10000)) + '&to=' + \
