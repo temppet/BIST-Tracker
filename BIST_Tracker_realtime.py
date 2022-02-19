@@ -71,15 +71,14 @@ class stock:
 
 
 def create_Stocks():
-    StockList = ['MAVI', 'ASELS', 'THYAO', 'ERBOS', 'MGROS', 'KRDMD', 'TTKOM', 'ISCTR',
-                 'KARSN', 'ARCLK', 'ALARK', 'KLGYO', 'VAKKO', 'PETKM', 'TCELL', 'BERA',
-                 'GLYHO', 'CCOLA', 'KCHOL', 'GARAN', 'ENKAI', 'AKGRT', 'TAVHL',
-                 'KOZAL', 'BRSAN', 'ULKER', 'VESTL', 'YATAS', 'SASA', 'SELEC', 'SISE',
-                 'TMSN', 'TOASO', 'TTRAK', 'SOKM', 'KAREL', 'KARTN', 'KLMSN',
-                 'KORDS', 'LOGO', 'MPARK', 'NETAS', 'OTKAR', 'SARKY', 'HALKB', 'HEKTS',
-                 'IPEKE', 'ISDMR', 'ISMEN', 'ECZYT', 'ENJSA', 'FROTO', 'CEMTS', 'CIMSA',
-                 'CLEBI', 'DOAS', 'ECILC', 'BRISA', 'AYGAZ', 'EREGL', 'ALGYO', 'AKSA',
-                 'AKCNS', 'KOZAA', 'SAHOL', 'AEFES', 'AGHOL']
+    StockList = ['MAVI', 'ASELS', 'THYAO', 'KRDMD', 'TTKOM', 'ISCTR',
+                 'KARSN', 'ARCLK', 'ALARK', 'PETKM', 'TCELL',
+                 'KCHOL', 'GARAN', 'TAVHL', 'TUPRS', 'GUBRF',
+                 'KOZAL', 'BRSAN', 'SASA', 'SISE', 'OSTIM',
+                 'TOASO', 'SOKM', 'KAREL', 'MARTI', 'ZOREN', 'BAYRK',
+                 'LOGO', 'MPARK', 'OTKAR', 'HALKB', 'HEKTS',
+                 'ISDMR', 'ENJSA', 'FROTO', 'EREGL', 'AKSA',
+                 'KOZAA', 'SAHOL']
     # StockList = ['ASELS', ]
     MyList = np.array([])
     for i in range(len(StockList)):
